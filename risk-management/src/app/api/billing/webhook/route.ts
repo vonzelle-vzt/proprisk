@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripeClient } from '@/lib/billing/stripe-client';
 import { processStripeEvent } from '@/lib/billing/webhook-handler';
+import { BILLING_ENABLED, BILLING_DISABLED_MESSAGE } from '@/lib/billing/config';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,8 +19,19 @@ export const dynamic = 'force-dynamic';
  * `request.text()`, never `request.json()` first. Stripe signs the exact
  * bytes it sent; re-serializing a parsed-and-reparsed body would not
  * reproduce them and every signature check would fail.
+ *
+ * When BILLING_ENABLED is false this route 404s before reading the request
+ * at all. That is not just tidiness: with Stripe unconfigured there is no
+ * signing secret, so no request reaching here could ever be a genuine
+ * signature-verified Stripe event — the only callers are unauthenticated
+ * ones, and the public allowlist entry for this path (see
+ * src/lib/auth/public-routes.ts) means middleware will not turn them away.
  */
 export async function POST(request: NextRequest) {
+  if (!BILLING_ENABLED) {
+    return NextResponse.json({ error: BILLING_DISABLED_MESSAGE }, { status: 404 });
+  }
+
   const signature = request.headers.get('stripe-signature');
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 

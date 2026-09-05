@@ -20,7 +20,16 @@ machine-checked isolation suite, deterministic golden vectors — but verified
 is not the same as proven in production. Only 2 of 10 provider adapters are
 real (MatchTrader, Tradovate); the 7 presets ship unverified by design (see
 "Key design decisions" below); realtime provider feeds for intraday-trailing
-firms remain a poll/push snapshot pipeline, not streaming. Code: tenancy —
+firms remain a poll/push snapshot pipeline, not streaming.
+
+**2026-09-05 update:** the public marketing surface (`/home`, `/pricing`)
+described below has been removed. This is now a self-hosted admin console: a
+signed-out visitor lands on `/login`, not a landing page. Billing is optional,
+behind `BILLING_ENABLED` (default `false`) — a firm running its own instance
+for itself pays nothing and sees no billing surface; the Stripe flow below is
+only for someone choosing to run this as a hosted service for other firms.
+
+Code: tenancy —
 `risk-management/supabase/migrations/00015_tenancy.sql`,
 `src/lib/db/tenant-scoped.ts`; rule packs — `src/lib/rulepack/`; staged launch
 — `src/lib/rulepack/store.ts`, `docs/TAILORING.md` §6.

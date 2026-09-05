@@ -230,6 +230,16 @@ deployment.
 which tokens are themeable and which are structural, and it has a compliance gate
 with baselines that will fail your build if you widen the raw-colour debt.
 
+### Running it as a hosted service
+
+By default this is a self-hosted admin console with no public site and no
+billing: signed-out visitors land on `/login`, and the three `/api/billing/*`
+routes 404. If you want to run it as a hosted service for other firms instead,
+set `BILLING_ENABLED=true`, add the Stripe environment variables it then reads
+(`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and one `STRIPE_PRICE_*` per
+plan), and define your own plans in `risk-management/src/lib/billing/plans.ts`.
+Nothing else in the app depends on billing being on.
+
 ---
 
 ## 4. Connect your trading platform

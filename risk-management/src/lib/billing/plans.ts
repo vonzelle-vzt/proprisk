@@ -1,9 +1,14 @@
 /**
  * The pricing tiers. This is the single source of truth for plan shape —
- * entitlement enforcement (`entitlements.ts`), the Stripe checkout route, and
- * the public pricing page all read from this table rather than each hardcoding
- * their own copy, so a price or ceiling never drifts between what a tenant is
- * charged, what they're entitled to, and what the marketing page promises.
+ * entitlement enforcement (`entitlements.ts`) and the Stripe checkout route
+ * both read from this table rather than each hardcoding their own copy, so a
+ * price or ceiling never drifts between what a tenant is charged and what
+ * they are entitled to.
+ *
+ * Nothing here applies unless BILLING_ENABLED=true (see ./config): the
+ * default self-hosted deployment sells nothing, has no pricing page, and
+ * takes the unlimited path in entitlements.ts without consulting this table
+ * at all.
  *
  * Priced by funded accounts monitored (not seats, not trade volume) because
  * that is the number that drives our own cost to serve a firm — polling,

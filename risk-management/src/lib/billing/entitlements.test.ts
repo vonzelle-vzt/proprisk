@@ -33,6 +33,17 @@ vi.mock('./metering', () => ({
   countFundedAccountsMonitored: vi.fn(),
 }));
 
+// Billing is OFF by default in this repo (BILLING_ENABLED is unset in the
+// test environment, exactly as on a self-hosted deployment), so the plan-tier
+// tests below would otherwise all take the unlimited path and prove nothing.
+// The flag is mocked as a live getter so one file can exercise both sides.
+const billingFlag = vi.hoisted(() => ({ enabled: true }));
+vi.mock('./config', () => ({
+  get BILLING_ENABLED() {
+    return billingFlag.enabled;
+  },
+}));
+
 import { countFundedAccountsMonitored } from './metering';
 import { checkEntitlement, canOnboardNewAccount, formatEntitlementWarning } from './entitlements';
 
@@ -40,6 +51,7 @@ const countMock = vi.mocked(countFundedAccountsMonitored);
 
 beforeEach(() => {
   vi.clearAllMocks();
+  billingFlag.enabled = true;
 });
 
 describe('checkEntitlement', () => {
@@ -151,6 +163,45 @@ describe('formatEntitlementWarning', () => {
 
     expect(message).toMatch(/keep being monitored/i);
     expect(message).not.toMatch(/stop|suspend|disable/i);
+  });
+});
+
+describe('with billing turned off (the self-hosted default)', () => {
+  it('grants an unlimited ceiling and reads no plan at all', async () => {
+    billingFlag.enabled = false;
+    countMock.mockResolvedValueOnce(50_000);
+
+    const status = await checkEntitlement('tenant-1');
+
+    expect(status).toMatchObject({
+      planTier: 'self-hosted',
+      limit: null,
+      used: 50_000,
+      withinLimit: true,
+      canOnboardNewAccount: true,
+      overBy: 0,
+    });
+    // No subscription row, no tenants.plan_tier: with no billing there is no
+    // plan to look up, so a firm cannot inherit a ceiling from a pricing
+    // table it never signed up to.
+    expect(tenantSelectMock).not.toHaveBeenCalled();
+    expect(globalTableSelectMock).not.toHaveBeenCalled();
+    // ...and nothing to warn a firm about.
+    expect(formatEntitlementWarning(status)).toBeNull();
+  });
+
+  it('never refuses to onboard a funded account, at any usage', async () => {
+    billingFlag.enabled = false;
+    countMock.mockResolvedValueOnce(999_999);
+
+    await expect(canOnboardNewAccount('tenant-1')).resolves.toBe(true);
+  });
+
+  it('still reports honest usage rather than pretending it is zero', async () => {
+    billingFlag.enabled = false;
+    countMock.mockResolvedValueOnce(37);
+
+    await expect(checkEntitlement('tenant-1')).resolves.toMatchObject({ used: 37 });
   });
 });
 

@@ -3,13 +3,17 @@
 The manifest of every screenshot the documentation references. Nothing here
 contains a real firm's data.
 
-**All thirteen are captured from demo mode** (`NEXT_PUBLIC_DEMO_MODE=true`),
+**All eleven are captured from demo mode** (`NEXT_PUBLIC_DEMO_MODE=true`),
 which serves coherent mock data from every API with no database, no trading
 platform and no keys. That now includes the two that used to need a seeded
 throwaway instance: the trader page resolves the fixed demo token at `/a/demo`
 (`risk-management/src/lib/trader/demo.ts`), and a violation report is assembled
 from the same mock dataset (`risk-management/src/lib/reports/violation/demo.ts`),
 so `GET /api/violations/100185-grid/report?format=pdf` returns a real PDF.
+
+There is no public landing page or pricing page to capture. This is a
+self-hosted admin console; the signed-out entry point is the login screen at
+`/login`, not a marketing page, so it is not included as a screenshot here.
 
 To regenerate any of them:
 
@@ -18,11 +22,10 @@ cd risk-management
 NEXT_PUBLIC_DEMO_MODE=true npm run dev
 ```
 
-then open the path in the table below and capture the viewport. The twelve
-browser captures are 1546x795 (`01-home.png` is 1523x784, taken at a slightly
-narrower window); `13-violation-report-pdf.png` is page one of the downloaded
-PDF rendered at A4, 595x842. Keep the filenames — every document links to them
-by name.
+then open the path in the table below and capture the viewport. The ten
+browser captures are 1546x795; `13-violation-report-pdf.png` is page one of the
+downloaded PDF rendered at A4, 595x842. Keep the filenames — every document
+links to them by name.
 
 Non-screenshot artwork does not live here: the README banner is
 [`../assets/banner.jpg`](../assets/banner.jpg), and anything else that is drawn
@@ -35,8 +38,6 @@ fails the build.
 
 | File | Captured at | What it shows |
 |---|---|---|
-| `01-home.png` | `/home` | The public landing page a signed-out visitor reaches, prices included |
-| `02-pricing.png` | `/pricing` | Published pricing — four tiers metered by funded accounts monitored |
 | `03-risk-dashboard.png` | `/risk` | The risk dashboard: firm-wide exposure, payout-liability forecast, severity distribution, flagged accounts |
 | `04-violations.png` | `/violations` | Violations grouped by rule, with a PDF and CSV download on every row |
 | `05-violation-detail.png` | `/violations/account/100185` | One account's violation report: every breach with its trades and arithmetic, plus an account-wide CSV |

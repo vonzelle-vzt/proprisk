@@ -1,3 +1,5 @@
+import { BILLING_ENABLED } from '@/lib/billing/config';
+
 const REQUIRED_VARS = [
   'NEXT_PUBLIC_SUPABASE_URL',
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
@@ -31,7 +33,41 @@ const OPTIONAL_VARS = [
   // demo mode falls back to a placeholder address; outside demo mode the
   // support module itself throws if this is unset.
   'SUPPORT_INBOX_EMAIL',
+  // Stripe billing is opt-in and off by default — this is a self-hosted
+  // console, not a storefront (src/lib/billing/config.ts). Unset is a valid,
+  // supported deployment, so the flag itself is never required.
+  'BILLING_ENABLED',
 ] as const;
+
+// Only meaningful when BILLING_ENABLED=true, and then these two ARE billing:
+// without the secret key nothing can create a checkout or portal session, and
+// without the signing secret the webhook has no authentication and rejects
+// every event. A deployment that opts into billing without them is broken in
+// a way worth reporting at cold start rather than at the first invoice.
+const BILLING_REQUIRED_VARS = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'] as const;
+
+// Per-tier Stripe Price ids. Optional even with billing on: a deployment may
+// sell only some tiers, and checkout already answers 501 naming the exact
+// missing env var for a tier it has no price for (src/lib/billing/checkout.ts).
+const BILLING_OPTIONAL_VARS = [
+  'STRIPE_PRICE_STARTER',
+  'STRIPE_PRICE_GROWTH',
+  'STRIPE_PRICE_SCALE',
+] as const;
+
+/**
+ * With billing off, the Stripe vars are not "missing" — they are irrelevant,
+ * and reporting them as optional-missing on every self-hosted deployment
+ * would train operators to ignore the report. They enter the lists only when
+ * the flag turns billing on.
+ */
+function requiredVars(): readonly string[] {
+  return BILLING_ENABLED ? [...REQUIRED_VARS, ...BILLING_REQUIRED_VARS] : REQUIRED_VARS;
+}
+
+function optionalVars(): readonly string[] {
+  return BILLING_ENABLED ? [...OPTIONAL_VARS, ...BILLING_OPTIONAL_VARS] : OPTIONAL_VARS;
+}
 
 export interface EnvValidationResult {
   valid: boolean;
@@ -40,17 +76,17 @@ export interface EnvValidationResult {
 }
 
 export function validateEnv(): EnvValidationResult {
-  const missing = REQUIRED_VARS.filter((v) => !process.env[v]);
-  const optionalMissing = OPTIONAL_VARS.filter((v) => !process.env[v]);
+  const missing = requiredVars().filter((v) => !process.env[v]);
+  const optionalMissing = optionalVars().filter((v) => !process.env[v]);
   return { valid: missing.length === 0, missing, optionalMissing };
 }
 
 export function getEnvReport(): Record<string, 'set' | 'missing'> {
   const report: Record<string, 'set' | 'missing'> = {};
-  for (const v of REQUIRED_VARS) {
+  for (const v of requiredVars()) {
     report[v] = process.env[v] ? 'set' : 'missing';
   }
-  for (const v of OPTIONAL_VARS) {
+  for (const v of optionalVars()) {
     report[v] = process.env[v] ? 'set' : 'missing';
   }
   return report;

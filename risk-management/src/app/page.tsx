@@ -5,13 +5,15 @@ import { DEMO_MODE } from '@/lib/demo';
 /**
  * The root splits by who is asking.
  *
- * Before this was a self-serve product, `/` redirected straight to `/risk` and
- * middleware bounced anyone signed-out to `/login` — which meant a prospective
- * customer typing the domain hit a login wall and never saw what they were
- * being asked to buy. Signed-out traffic now lands on the marketing page.
+ * This is a self-hosted admin console for a firm's own risk team, not a
+ * storefront: there is no public surface to send an anonymous visitor to, so
+ * `/` bounces them to the login screen. (The root itself stays on the
+ * middleware allowlist — see src/lib/auth/public-routes.ts — precisely so
+ * this redirect is the thing that decides, rather than a middleware bounce
+ * that would append a pointless `?next=/`.)
  *
- * A demo deployment is a sales demo: send it to the operator view, which is the
- * thing being demonstrated.
+ * A demo deployment is a sales demo: send it to the operator view, which is
+ * the thing being demonstrated.
  */
 export default async function Root() {
   if (DEMO_MODE) redirect('/risk');
@@ -19,5 +21,5 @@ export default async function Root() {
   const supabase = await createClient();
   const { data } = await supabase.auth.getUser();
 
-  redirect(data.user ? '/risk' : '/home');
+  redirect(data.user ? '/risk' : '/login');
 }

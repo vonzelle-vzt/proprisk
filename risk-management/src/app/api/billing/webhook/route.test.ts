@@ -11,6 +11,17 @@ vi.mock('@/lib/billing/webhook-handler', () => ({
   processStripeEvent: (...args: unknown[]) => processStripeEventMock(...args),
 }));
 
+// Billing is off by default (BILLING_ENABLED unset), which would 404 every
+// case below before it reached the signature logic. Mocked as a live getter
+// so the flag-off case can be asserted in the same file.
+const billingFlag = vi.hoisted(() => ({ enabled: true }));
+vi.mock('@/lib/billing/config', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/billing/config')>()),
+  get BILLING_ENABLED() {
+    return billingFlag.enabled;
+  },
+}));
+
 import { POST } from './route';
 
 function buildRequest(opts: { signature?: string | null; body?: string }) {
@@ -23,7 +34,23 @@ function buildRequest(opts: { signature?: string | null; body?: string }) {
 describe('POST /api/billing/webhook', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    billingFlag.enabled = true;
     process.env.STRIPE_WEBHOOK_SECRET = 'whsec_test';
+  });
+
+  it('404s when billing is not enabled, without reading the request at all', async () => {
+    billingFlag.enabled = false;
+    // Even the best-case caller — a signing secret configured and a signature
+    // present — gets nothing: with Stripe off there is no account that could
+    // have signed this, so there is no such endpoint.
+    const res = await POST(buildRequest({ signature: 'sig_whatever' }) as never);
+
+    expect(res.status).toBe(404);
+    await expect(res.json()).resolves.toEqual({
+      error: 'Billing is not enabled on this deployment',
+    });
+    expect(constructEventMock).not.toHaveBeenCalled();
+    expect(processStripeEventMock).not.toHaveBeenCalled();
   });
 
   it('rejects a request with no stripe-signature header WITHOUT touching the event handler', async () => {

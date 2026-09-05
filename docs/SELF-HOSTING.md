@@ -131,7 +131,8 @@ covers them and the release gate refuses to export a tree where one is tracked.
 | `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN` | Rate limiting falls back to in-memory, which is per-instance and therefore weaker under horizontal scaling |
 | `RESEND_API_KEY` | Falls back to Gmail if `GMAIL_USER` and `GMAIL_APP_PASSWORD` are set; otherwise notices are drafted and logged, not sent |
 | `BRAND_EMAIL_FROM`, `BRAND_EMAIL_SENDER_NAME` | Sender defaults |
-| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, `STRIPE_PRICE_SCALE` | Billing routes are inert |
+| `BILLING_ENABLED` | Optional, default `false`. Set to `true` only if you're running this as a hosted service for other firms; the three `/api/billing/*` routes 404 while it's off, and no Stripe variable is read |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_GROWTH`, `STRIPE_PRICE_SCALE` | Needed only when `BILLING_ENABLED=true`. Billing routes are inert (404) otherwise |
 | `ANTHROPIC_API_KEY` | Chat and narrative polish are disabled. No decision path depends on this |
 | `RISK_WEBHOOK_URL`, `RISK_SLACK_WEBHOOK_URL` | Breach notifications are not fanned out |
 | `ENFORCEMENT_AGENT_ENABLED`, `REVIEWER_AGENT_ENABLED` | Those agents stay off |

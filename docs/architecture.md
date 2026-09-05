@@ -31,7 +31,7 @@ flowchart TB
     subgraph app["Next.js 14 application — one deployment, many firms"]
         direction TB
         mw["middleware.ts<br/>deny-by-default auth"]
-        pages["Server components<br/>src/app/(dashboard|marketing|trader)"]
+        pages["Server components<br/>src/app/(dashboard|auth|trader)"]
         api["Route handlers<br/>src/app/api (~100 routes)"]
         crons["Cron routes<br/>src/app/api/cron/** (9 jobs)"]
         engine["Rule-pack engine<br/>src/lib/rulepack — pure, deterministic"]
@@ -95,7 +95,7 @@ flowchart TD
 
     mw -->|"/api/cron/*"| cronsec{"Bearer CRON_SECRET"}
     mw -->|"/api/platform-admin/*"| adminsec{"Bearer PLATFORM_ADMIN_SECRET"}
-    mw -->|"public allowlist<br/>src/lib/auth/public-routes.ts"| public["Marketing, signup,<br/>Stripe webhook, trader links"]
+    mw -->|"public allowlist<br/>src/lib/auth/public-routes.ts"| public["Login, signup,<br/>Stripe webhook (if BILLING_ENABLED), trader links"]
     mw -->|"everything else"| session{"Supabase session?"}
 
     cronsec -->|no| deny401["401"]

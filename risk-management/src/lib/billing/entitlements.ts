@@ -1,4 +1,5 @@
 import { tenantDb, globalTable } from '@/lib/db/tenant-scoped';
+import { BILLING_ENABLED } from './config';
 import { countFundedAccountsMonitored } from './metering';
 import { maxAccountsForTier } from './plans';
 
@@ -20,6 +21,10 @@ import { maxAccountsForTier } from './plans';
  * pipeline. The only thing a caller can do with `canOnboardNewAccount()`
  * returning false is refuse to CREATE a new account — see
  * entitlements.test.ts, which asserts this module never issues a write.
+ *
+ * None of this applies at all when BILLING_ENABLED is false (the default —
+ * see ./config): there is no plan, so there is no ceiling. See
+ * `checkEntitlement` for what the flag-off path returns and why.
  */
 
 export interface EntitlementStatus {
@@ -69,7 +74,42 @@ async function resolvePlanTier(tenantId: string): Promise<string> {
   return tenant?.plan_tier ?? 'starter';
 }
 
+/**
+ * Plan tier reported when the deployment does not bill at all. Deliberately
+ * not one of the PlanTier values in plans.ts: a self-hosted firm is not on
+ * "starter", it is on no commercial plan whatsoever, and calling it starter
+ * would let a later `maxAccountsForTier('starter')` reintroduce a 25-account
+ * ceiling nobody agreed to.
+ */
+const UNBILLED_TIER = 'self-hosted';
+
 export async function checkEntitlement(tenantId: string): Promise<EntitlementStatus> {
+  // BILLING_ENABLED=false is the self-hosted case: the firm runs this console
+  // on its own infrastructure and never signed up to a pricing table, so
+  // there is no ceiling to enforce on anyone's behalf. Grant unlimited —
+  // expressed as `limit: null`, the exact shape enterprise already uses, so
+  // every consumer (and formatEntitlementWarning, which returns null for a
+  // null limit) needs no flag of its own.
+  //
+  // Refusing to onboard a funded account for a commercial reason that does
+  // not apply to this deployment would be precisely the failure the header
+  // comment above says this module must never cause.
+  //
+  // The usage count is still read: it is one COUNT of the firm's own rows,
+  // it keeps `used` an honest number for any admin display, and nothing is
+  // compared against it here.
+  if (!BILLING_ENABLED) {
+    return {
+      tenantId,
+      planTier: UNBILLED_TIER,
+      limit: null,
+      used: await countFundedAccountsMonitored(tenantId),
+      withinLimit: true,
+      canOnboardNewAccount: true,
+      overBy: 0,
+    };
+  }
+
   const [planTier, used] = await Promise.all([
     resolvePlanTier(tenantId),
     countFundedAccountsMonitored(tenantId),

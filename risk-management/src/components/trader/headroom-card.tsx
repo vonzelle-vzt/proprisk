@@ -9,7 +9,7 @@ import type { HeadroomItem } from '@/lib/trader/headroom';
  * Deliberately calmer than the operator terminal's dense StatCard: this is
  * read by one person on a phone, not scanned across a book of accounts.
  * DESIGN.md documents no trader-facing surface (see the report for this
- * feature); this borrows the marketing surface's larger type scale as the
+ * feature); this uses a larger type scale than the dense operator console, as the
  * only prior art in this repo for a non-operator audience, rather than the
  * terminal's 10-11px density.
  */

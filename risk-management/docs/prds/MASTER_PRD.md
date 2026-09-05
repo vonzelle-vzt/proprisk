@@ -15,6 +15,12 @@ newer, and are verified — a green test suite, a machine-checked isolation
 suite, deterministic golden vectors — but verified is not the same as
 proven in production. See `risk-management/docs/HOW-IT-WORKS.md` §8.
 
+**2026-09-05 update:** the public marketing surface (`/home`, `/pricing`)
+has been removed; this is a self-hosted admin console, not a hosted product
+with a public site. A signed-out visitor lands on `/login`. Billing is
+optional, behind `BILLING_ENABLED` (default `false`), for anyone who chooses
+to run this as a hosted service for other firms.
+
 ## Product Vision
 
 **White-label, multi-asset (Futures + Forex) risk-management platform for prop trading firms** — one risk

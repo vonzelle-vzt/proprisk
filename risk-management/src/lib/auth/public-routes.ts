@@ -28,13 +28,20 @@ export const PUBLIC_API_PREFIXES = [
  * `pathname === page || pathname.startsWith(page + '/')`, and for '/' the
  * second arm becomes `startsWith('//')`, which no ordinary path satisfies.
  *
- * The root must be public so a signed-out visitor reaches the marketing page
- * rather than a login wall; src/app/page.tsx then routes them by session.
+ * The root must be public so that src/app/page.tsx is the code that decides
+ * where a visitor goes (signed out -> /login, signed in -> /risk), rather
+ * than middleware bouncing '/' with a pointless `?next=/`. It renders nothing
+ * itself, so making it public exposes no data.
+ *
+ * There is deliberately no marketing surface here: this is a self-hosted
+ * console for a firm's own risk team, so the old landing and pricing routes
+ * were deleted and must not be re-added to this list. public-routes.test.ts
+ * asserts they are no longer public.
  */
 // '/a' is the trader-facing account view (src/app/(trader)/a/[token]) — the
 // token in the path is the whole authentication check, verified server-side
 // on every request. It carries no session and reaches no other route.
-export const PUBLIC_PAGES = ['/', '/login', '/signup', '/accept-invite', '/home', '/pricing', '/a'];
+export const PUBLIC_PAGES = ['/', '/login', '/signup', '/accept-invite', '/a'];
 
 export function isPublicApi(pathname: string): boolean {
   return PUBLIC_API_PREFIXES.some((prefix) => pathname.startsWith(prefix));

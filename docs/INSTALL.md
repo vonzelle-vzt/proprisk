@@ -224,6 +224,9 @@ shared.
    `SUPABASE_SERVICE_ROLE_KEY`, `CRON_SECRET`, `PLATFORM_ADMIN_SECRET`,
    `CONNECTIONS_MASTER_KEY`, `NEXT_PUBLIC_APP_URL`, `SUPPORT_INBOX_EMAIL`,
    and `NEXT_PUBLIC_DEMO_MODE=false`). Mark the secrets as sensitive.
+   `BILLING_ENABLED` is optional and defaults to `false`; leave it unset
+   unless you're running this as a hosted service, in which case set it to
+   `true` and add the `STRIPE_*` variables it then requires.
 3. Apply the database migrations against your Supabase project first (Option
    D steps 2-3, pointed at the real project, or `scripts/setup.sh --live
    --db-url <your-connection-string>`).

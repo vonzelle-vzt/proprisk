@@ -771,13 +771,13 @@ An adapter that is not implemented must:
 Each step names the data written, because "the flow works" is not checkable and
 "the row exists with these columns set" is.
 
-### 6.1 Flow 1 — Onboarding: purchase to enforcing
+### 6.1 Flow 1 — Onboarding: signup to enforcing
 
 The whole point of the architecture is that this needs no call from the vendor.
 
 | # | Step | Written |
 |---|---|---|
-| 1 | Purchase, or straight to signup | `subscriptions` row (if billing is on) |
+| 1 | Signup, or purchase first if `BILLING_ENABLED=true` and you are running this as a hosted service | `subscriptions` row (only if billing is on) |
 | 2 | `POST /api/tenancy/signup` creates the firm and its owner | `tenants` (with `enforcement_approval_required = true`), `tenant_members` with role `owner`; the tenant claim is minted into the user's `app_metadata` |
 | 3 | Invite the team | `tenant_invites` (hash only, with an expiry); on acceptance a `tenant_members` row and a claim |
 | 4 | Connect the trading platform at `/connections` | `connections` row, secrets envelope-encrypted, `status = 'unvalidated'` |
@@ -1178,7 +1178,7 @@ Pages, and what each must show:
 
 | Page | Must show |
 |---|---|
-| `/home`, `/pricing` | The product and its prices, to a signed-out visitor |
+| `/login` | Sign in. What a signed-out visitor sees — there is no public marketing surface |
 | `/signup`, `/accept-invite` | Self-serve firm creation; invite redemption |
 | `/risk` | Severity distribution, violation breakdown, flagged accounts |
 | `/violations` | Violations grouped by rule, each row with PDF and CSV |
@@ -1383,13 +1383,18 @@ cd risk-management && ls src/lib/disputes/lifecycle.ts supabase/migrations/00023
 Expected: both files list; the grep prints at least `4` (one per authenticated
 policy); the tests pass.
 
-### M10 — Billing and the public surface
+### M10 — Optional billing
 
-**Goal.** A firm can buy without talking to anyone, and see the price first.
+**Goal.** Billing is optional and off by default, because this is a self-hosted
+admin console, not a hosted product with a marketing surface. Set
+`BILLING_ENABLED=true` if you want to run it as a hosted service for other
+firms.
 
-**Deliverables.** Stripe checkout, portal and a signature-verified webhook;
-metering by funded accounts monitored; entitlements enforced against
-`tenants.max_accounts`; the landing and pricing pages with prices published.
+**Deliverables.** Stripe checkout, portal and a signature-verified webhook,
+gated behind `BILLING_ENABLED` — the three `/api/billing/*` routes return 404
+and no Stripe env var is read while it is off; metering by funded accounts
+monitored; entitlements enforced against `tenants.max_accounts` when billing is
+on. No landing or pricing page — signed-out visitors see `/login`.
 
 ```bash
 cd risk-management && npx vitest run src/lib/billing src/app/api/billing

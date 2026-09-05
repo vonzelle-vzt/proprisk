@@ -15,13 +15,12 @@ is right and this file is a bug.
 ## Pages
 
 All pages under `(dashboard)` require a session with both a role and a tenant
-claim. `(marketing)`, `(auth)` and `(trader)` do not.
+claim. `(auth)` and `(trader)` do not. There is no public marketing surface —
+this is a self-hosted admin console, not a hosted product with a website.
 
 | Route | Group | What it shows |
 |---|---|---|
-| `/` | root | Routes a visitor by session: marketing when signed out, dashboard when signed in |
-| `/home` | marketing | Public landing page |
-| `/pricing` | marketing | Published pricing, tier by funded accounts monitored |
+| `/` | root | Routes a visitor by session: `/login` when signed out (`/risk` in demo mode), dashboard when signed in |
 | `/login` | auth | Sign in |
 | `/signup` | auth | Self-serve tenant creation — creates the firm and its owner |
 | `/accept-invite` | auth | Redeem a tenant-bound team invite |
@@ -64,9 +63,9 @@ Methods below are the handlers actually exported by each `route.ts`.
 | `/api/tenancy/signup` | POST | Create a tenant and its owner. Public — runs before the caller has a claim |
 | `/api/tenancy/invites` | GET, POST | List and issue tenant-bound invites |
 | `/api/tenancy/invites/accept` | POST | Redeem an invite and mint a tenant-scoped session. Public |
-| `/api/billing/checkout` | POST | Stripe checkout session |
-| `/api/billing/portal` | POST | Stripe customer portal |
-| `/api/billing/webhook` | POST | Signature-verified Stripe webhook. Public — Stripe cannot present a cookie |
+| `/api/billing/checkout` | POST | Stripe checkout session. Only when `BILLING_ENABLED=true`; 404 otherwise |
+| `/api/billing/portal` | POST | Stripe customer portal. Only when `BILLING_ENABLED=true`; 404 otherwise |
+| `/api/billing/webhook` | POST | Signature-verified Stripe webhook. Public — Stripe cannot present a cookie. Only when `BILLING_ENABLED=true`; 404 otherwise |
 | `/api/support/tickets` | GET, POST | Support requests with diagnostics, mailed to `SUPPORT_INBOX_EMAIL` |
 
 ### Connections — per-tenant platform credentials
@@ -355,7 +354,6 @@ was never read by application code and rule packs supersede it.
     │   └── tests/verify-isolation.sh
     └── src/
         ├── app/
-        │   ├── (marketing)/      home, pricing
         │   ├── (auth)/           login, signup, accept-invite
         │   ├── (trader)/a/[token]/
         │   ├── (dashboard)/      the operator console

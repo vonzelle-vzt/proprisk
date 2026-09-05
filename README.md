@@ -11,18 +11,14 @@ anything, and leave behind a decision record you can hand to a disputing trader.
 [![Security](https://github.com/vonzelle-vzt/proprisk/actions/workflows/security.yml/badge.svg)](https://github.com/vonzelle-vzt/proprisk/actions/workflows/security.yml)
 [![Node](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](./risk-management/package.json)
 
-**Who this is for.** An engineer at a prop firm who wants a risk system they can
-read, fork, and point at their own trading platform — and anyone who would
-rather hand a spec to a coding agent than adopt a black box. Maintained by VZT
-Tech Consulting under the MIT licence.
+**Who this is for.** A prop firm's own risk and engineering team, running it
+for themselves — self-hosted, with no public site in front of it — and anyone
+who would rather hand a spec to a coding agent than adopt a black box.
+Maintained by VZT Tech Consulting under the MIT licence.
 
 ---
 
 <table>
-<tr>
-<td width="50%"><img src="docs/screenshots/01-home.png" alt="Public landing page"><br><sub><b>The landing page</b> — the whole pitch and the prices on one screen, because a firm that can qualify itself on a backtest should not have to book a call to learn what it costs.</sub></td>
-<td width="50%"><img src="docs/screenshots/02-pricing.png" alt="Published pricing"><br><sub><b>Published pricing</b> — four tiers metered by funded accounts monitored, the one number that actually drives cost to serve.</sub></td>
-</tr>
 <tr>
 <td colspan="2" align="center"><img src="docs/screenshots/13-violation-report-pdf.png" alt="Generated violation report PDF" width="440"><br><sub><b>The deliverable.</b> A generated violation report: the rule as written, what happened, the arithmetic, the timeline, the trades, and the account at detection — over a content hash in the footer. This is the file you hand a disputing trader, and the reason the rest of the product exists.</sub></td>
 </tr>
@@ -49,7 +45,7 @@ Tech Consulting under the MIT licence.
 </table>
 
 Every screenshot is listed in [`docs/screenshots/README.md`](./docs/screenshots/README.md)
-and all thirteen were captured from demo mode against mock data, so none of them
+and all eleven were captured from demo mode against mock data, so none of them
 contains a real firm's data — and you can reproduce any of them in five minutes.
 
 ---
@@ -118,10 +114,12 @@ a drawdown". The full argument is in
   `GET /api/violations/account/[accountId]/report`, and a trader's own copy
   behind their link. Deterministic because a report a trader disputes must not
   change between two downloads.
-- **Billing and published pricing** — Stripe checkout, portal and a
-  signature-verified webhook, metered by funded accounts monitored, with prices
-  on a public page. Small, and it will be copied, but it is only credible
-  because the backtest lets a firm self-qualify without talking to anyone.
+- **Optional billing (off by default)** — set `BILLING_ENABLED=true` if you
+  want to run this as a hosted service for other firms, and Stripe checkout,
+  portal and a signature-verified webhook come online, metered by funded
+  accounts monitored. Leave it off and the three `/api/billing/*` routes
+  404 and no Stripe env var is ever read — a self-hosted admin console has
+  no reason to bill itself.
 
 ## Quick start — the demo, in five minutes
 
@@ -136,35 +134,33 @@ cp .env.local.example .env.local     # already has NEXT_PUBLIC_DEMO_MODE=true
 npm run dev
 ```
 
-Auth is bypassed, so <http://localhost:3000> lands straight on the operator
-console. The whole tour, in order:
+Auth is bypassed, so <http://localhost:3000> lands straight on `/risk`, the
+operator console. The whole tour, in order:
 
-1. **`/home`** and **`/pricing`** — the public pages: what a firm is told, and
-   what it costs, with no sales call in front of either.
-2. **`/risk`** — the dashboard. Firm-wide exposure across both books, the
+1. **`/risk`** — the dashboard. Firm-wide exposure across both books, the
    payout-liability forecast, severity distribution, flagged accounts.
    **Generate Risk Report** produces the morning report on the spot.
-3. **`/alerts`** — the live breach feed. The Forex / Futures toggle in the
+2. **`/alerts`** — the live breach feed. The Forex / Futures toggle in the
    header re-scopes this and every other page.
-4. **`/violations`** — violations grouped by rule. Press **PDF** on any row:
+3. **`/violations`** — violations grouped by rule. Press **PDF** on any row:
    `GET /api/violations/100185-grid/report?format=pdf` renders a real,
    two-page report from a real payload, not a placeholder.
-5. **`/violations/account/100185`** — every breach on one account, with
+4. **`/violations/account/100185`** — every breach on one account, with
    **Export all (CSV)** for the whole account.
-6. **`/rules`** — three sample packs: `demo-apex-futures` (active, v2),
+5. **`/rules`** — three sample packs: `demo-apex-futures` (active, v2),
    `demo-topstep-futures-draft`, and `demo-ftmo-forex`.
-7. **`/rules/demo-apex-futures` → Backtest → Run backtest** — the real engine
+6. **`/rules/demo-apex-futures` → Backtest → Run backtest** — the real engine
    against a synthetic 90-day tape. Six accounts evaluated, one engine breach,
    zero the platform caught and this pack missed, and one rule reported
    `skipped` with the reason it could not be evaluated. The verdict reads
    **Not safe to activate**, which is the entire point of the screen.
-8. **`/enforcement`** — the queue: recommendations waiting for a human, scored
+7. **`/enforcement`** — the queue: recommendations waiting for a human, scored
    and escalated, none of them acted on until someone approves.
-9. **`/disputes`** — cases pinned to evidence, under the overturn rate per rule.
-10. **`/evidence/demo-account-100185`** — the dossier behind a decision, with
+8. **`/disputes`** — cases pinned to evidence, under the overturn rate per rule.
+9. **`/evidence/demo-account-100185`** — the dossier behind a decision, with
     **Export JSON** and **Print / Save as PDF**.
-11. **`/connections`** — all ten adapters, two of them live.
-12. **`/a/demo`** — the trader's own page. Demo mode accepts one fixed token,
+10. **`/connections`** — all ten adapters, two of them live.
+11. **`/a/demo`** — the trader's own page. Demo mode accepts one fixed token,
     `demo`, and resolves it to mock account 500655: where the drawdown floor
     sits, how much daily loss is left, its consistency position, and a PDF and
     CSV of each decision record. This used to be the one page demo mode could
@@ -357,6 +353,11 @@ schedules live in `risk-management/vercel.json` — or to any Node host with an
 external scheduler.
 
 ## Frequently asked
+
+**Is there a public website or pricing page?** No — this is an admin console.
+Signed-out visitors see the login screen, not a pitch. Billing is optional and
+off by default; see `BILLING_ENABLED` in [`docs/TAILORING.md`](./docs/TAILORING.md)
+if you want to run it as a hosted service for other firms.
 
 **Is this a trading platform?** No. It never sees an order, a chart or a price
 feed, and it will not make your traders faster. It reads what your platform

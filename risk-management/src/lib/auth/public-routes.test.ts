@@ -13,6 +13,26 @@ describe('page allowlist', () => {
     expect(isPublicPage(path)).toBe(true);
   });
 
+  // Spelled out as literals rather than derived from PUBLIC_PAGES: the test
+  // above proves the list is honoured, this one proves the list is the list.
+  // Adding an entry here is a deliberate act, not a passing side effect.
+  it('is exactly the five routes that can be reached without a session', () => {
+    expect(PUBLIC_PAGES).toEqual(['/', '/login', '/signup', '/accept-invite', '/a']);
+    for (const path of ['/', '/login', '/signup', '/accept-invite', '/a']) {
+      expect(isPublicPage(path)).toBe(true);
+    }
+  });
+
+  // The marketing surface (landing + pricing) was deleted when this became a
+  // self-hosted console: those routes 404 now, and leaving them on the
+  // allowlist would silently un-protect whatever a future edit puts there.
+  it.each(['/home', '/pricing', '/home/anything', '/pricing/anything'])(
+    'no longer treats the removed marketing route %s as public',
+    (path) => {
+      expect(isPublicPage(path)).toBe(false);
+    }
+  );
+
   // The load-bearing assertion: '/' must not behave as a prefix wildcard.
   it.each([
     '/risk',
@@ -32,7 +52,7 @@ describe('page allowlist', () => {
   });
 
   // A prefix list will happily match a longer word that merely starts the same.
-  it.each(['/loginsomething', '/homework', '/pricingsecrets', '/signupadmin', '/accounts', '/alerts'])(
+  it.each(['/loginsomething', '/signupadmin', '/accept-invitations', '/accounts', '/alerts'])(
     'does not leak a public prefix into the sibling route %s',
     (path) => {
       expect(isPublicPage(path)).toBe(false);

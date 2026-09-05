@@ -50,12 +50,12 @@ Notice none of those is "we failed to detect a drawdown."
 
 ## 2. The four flows
 
-### Flow 1 — Onboarding: purchase to enforcing
+### Flow 1 — Onboarding: signup to enforcing
 
 The whole point of the architecture is that this needs no call from us.
 
 ```
-purchase ──▶ tenant + owner account ──▶ invite team
+signup ──▶ tenant + owner account ──▶ invite team
                                           │
                                           ▼
                               connect trading platform
@@ -412,11 +412,6 @@ fifty, the catalog covers the market and a new firm recognises itself in a
 preset. Competitors would have to relearn that from scratch, one onboarding call
 at a time.
 
-**Published pricing.** Small, and it will be copied. But in a market where every
-vendor hides prices behind a sales call, being the one that does not is a
-position — and it is only credible because the backtest lets a firm self-qualify
-without talking to anyone.
-
 ---
 
 ## 8. Honest current state
@@ -431,8 +426,8 @@ proven in production.
 Before a first paying customer:
 
 - **Only 2 of 10 provider adapters are real** (MatchTrader, Tradovate). The other
-  eight are well-researched stubs. Sell the two; waitlist the rest and say so on
-  the pricing page.
+  eight are well-researched stubs. Say so plainly to anyone evaluating the
+  other eight before they rely on them.
 - **The presets are drafts.** See §6.5.
 - **Nothing is deployed.** There is no hosted instance; see
   [`SELF-HOSTING.md`](../../docs/SELF-HOSTING.md) to run one.
