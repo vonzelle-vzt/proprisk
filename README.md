@@ -447,7 +447,7 @@ before you build on this.
 - **The dependency audit is not empty.** CI and the security workflow both pass
   and Dependabot is on, but the security job gates on *critical* findings only;
   the remaining high findings come from the pinned Next.js version, and
-  [issue #11](https://github.com/vonzelle-vzt/proprisk/issues/11) tracks the
+  [issue #1](https://github.com/vonzelle-vzt/proprisk/issues/1) tracks the
   Next 16 upgrade that clears them.
 
 ## Security
