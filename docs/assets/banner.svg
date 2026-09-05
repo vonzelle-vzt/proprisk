@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 500" width="1600" height="500" role="img" aria-label="PropRisk — open-source risk desk for prop trading firms">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a0a0a"/>
+      <stop offset="1" stop-color="#141414"/>
+    </linearGradient>
+    <linearGradient id="curveFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dc2626" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#dc2626" stop-opacity="0"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#ffffff" stroke-opacity="0.045" stroke-width="1"/>
+    </pattern>
+    <clipPath id="chart"><rect x="900" y="70" width="640" height="360" rx="14"/></clipPath>
+  </defs>
+
+  <rect width="1600" height="500" fill="url(#bg)"/>
+  <rect width="1600" height="500" fill="url(#grid)"/>
+
+  <!-- wordmark -->
+  <g font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <g transform="translate(80 96)">
+      <rect x="0" y="0" width="56" height="56" rx="14" fill="none" stroke="#c0c0c0" stroke-opacity="0.6" stroke-width="2.5"/>
+      <path d="M14 26 L28 40 L42 20" fill="none" stroke="#dc2626" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+    <text x="156" y="146" font-size="82" font-weight="800" letter-spacing="-2" fill="#e5e5e5">Prop<tspan fill="#dc2626">Risk</tspan></text>
+    <text x="82" y="206" font-size="27" font-weight="500" fill="#c0c0c0">Open-source risk desk for prop trading firms.</text>
+    <text x="82" y="248" font-size="19" fill="#8a8a8a">Versioned rule packs · shadow-mode backtests · evidence-backed breach decisions · hard tenant isolation</text>
+
+    <!-- pills -->
+    <g font-size="15" font-weight="600" fill="#e5e5e5">
+      <rect x="82" y="300" width="184" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12"/>
+      <text x="174" y="325" text-anchor="middle">Futures + Forex</text>
+      <rect x="278" y="300" width="230" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12"/>
+      <text x="393" y="325" text-anchor="middle">Human-approved enforcement</text>
+      <rect x="520" y="300" width="214" height="38" rx="19" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.12"/>
+      <text x="627" y="325" text-anchor="middle">PDF / CSV decision records</text>
+    </g>
+
+    <text x="82" y="398" font-size="15" fill="#8a8a8a" letter-spacing="2">MIT LICENSED · SELF-HOSTED · MULTI-TENANT · DETERMINISTIC ENGINE</text>
+  </g>
+
+  <!-- chart card -->
+  <rect x="900" y="70" width="640" height="360" rx="14" fill="#ffffff" fill-opacity="0.05" stroke="#ffffff" stroke-opacity="0.1"/>
+  <g clip-path="url(#chart)">
+    <!-- equity curve: peaks then a drawdown that breaches the trailing floor -->
+    <path d="M900 330 L960 318 L1010 300 L1060 306 L1110 270 L1160 262 L1210 236 L1260 246 L1310 208 L1360 218 L1410 258 L1450 284 L1490 322 L1540 340 L1540 430 L900 430 Z" fill="url(#curveFill)"/>
+    <path d="M900 330 L960 318 L1010 300 L1060 306 L1110 270 L1160 262 L1210 236 L1260 246 L1310 208 L1360 218 L1410 258 L1450 284 L1490 322 L1540 340" fill="none" stroke="#dc2626" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    <!-- trailing drawdown floor: steps up with each new high, then locks -->
+    <path d="M900 392 L1010 392 L1010 372 L1110 372 L1110 344 L1210 344 L1210 316 L1310 316 L1310 300 L1540 300" fill="none" stroke="#c0c0c0" stroke-width="2" stroke-dasharray="8 6" stroke-opacity="0.85"/>
+    <!-- breach marker -->
+    <circle cx="1490" cy="322" r="7" fill="#0a0a0a" stroke="#dc2626" stroke-width="3"/>
+  </g>
+  <g font-family="Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <text x="928" y="104" font-size="13" font-weight="600" fill="#8a8a8a" letter-spacing="1.5">ACCOUNT 500655 · TRAILING DRAWDOWN</text>
+    <text x="1512" y="104" font-size="13" font-weight="700" fill="#dc2626" text-anchor="end">BREACH · $1,240 BELOW FLOOR</text>
+    <text x="928" y="412" font-size="13" fill="#c0c0c0">— — floor (locked at initial balance)</text>
+    <text x="1512" y="412" font-size="13" fill="#e5e5e5" text-anchor="end">equity</text>
+  </g>
+</svg>

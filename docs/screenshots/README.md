@@ -28,7 +28,7 @@ downloaded PDF rendered at A4, 595x842. Keep the filenames — every document
 links to them by name.
 
 Non-screenshot artwork does not live here: the README banner is
-[`../assets/banner.jpg`](../assets/banner.jpg), and anything else that is drawn
+[`../assets/banner.jpg`](../assets/banner.jpg) (rendered from `banner.svg`, the editable source), and anything else that is drawn
 rather than captured belongs in `docs/assets/` alongside it.
 
 `scripts/release/check-doc-links.mjs` treats this list as its allowance: a
