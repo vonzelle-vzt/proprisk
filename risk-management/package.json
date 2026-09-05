@@ -22,7 +22,7 @@
     "csv-stringify": "^6.8.3",
     "d3-force": "^3.0.0",
     "date-fns": "^3.6.0",
-    "lucide-react": "^0.441.0",
+    "lucide-react": "^1.39.0",
     "next": "^14.2.0",
     "nodemailer": "^10.0.0",
     "pdfkit": "^0.20.2",
