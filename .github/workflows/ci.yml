@@ -85,4 +85,4 @@ jobs:
         run: |
           docker run -d -p 3000:3000 proprisk-demo
           sleep 8
-          curl -fsS localhost:3000/home >/dev/null
+          curl -fsS localhost:3000/risk >/dev/null
