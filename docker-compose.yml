@@ -1,0 +1,43 @@
+# PropRisk — Docker Compose.
+#
+# There is deliberately no Postgres service here. Live mode needs Supabase
+# Auth, not just a Postgres server: row-level security policies read
+# `request.jwt.claims -> app_metadata` for the tenant claim, which only
+# Supabase's auth/PostgREST layer populates. A plain `postgres:` container
+# gives you tables with no working isolation. For local live-mode work, run
+# the Supabase CLI (`supabase start`) or point at a hosted Supabase project —
+# see docs/INSTALL.md Option D.
+#
+# `docker compose up` starts the demo service below, which needs nothing but
+# the image build itself.
+
+services:
+  proprisk-demo:
+    build:
+      context: ./risk-management
+      args:
+        NEXT_PUBLIC_DEMO_MODE: "true"
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_DEMO_MODE: "true"
+
+  # Live-mode template — uncomment and fill in risk-management/.env.local
+  # (copy it from .env.local.example first, see docs/INSTALL.md) to run a
+  # real deployment locally. All NEXT_PUBLIC_* values must be correct at
+  # BUILD time, since Next inlines them into the client bundle; changing
+  # them in env_file alone after the image is built has no effect on the
+  # client — you would need to rebuild with matching --build-arg values.
+  #
+  # proprisk:
+  #   build:
+  #     context: ./risk-management
+  #     args:
+  #       NEXT_PUBLIC_DEMO_MODE: "false"
+  #       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+  #       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+  #       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL}
+  #   ports:
+  #     - "3000:3000"
+  #   env_file:
+  #     - risk-management/.env.local

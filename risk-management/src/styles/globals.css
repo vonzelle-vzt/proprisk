@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #0a0a0a;
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --accent-red: #dc2626;
+  --silver: #c0c0c0;
+  --silver-light: #e5e7eb;
+  --text-primary: #f5f5f5;
+  --text-secondary: #9ca3af;
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: 24px;
+}
+
+body {
+  background-color: #0a0a0a;
+  color: #f5f5f5;
+  font-family: "Inter", "Geist", sans-serif;
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl;
+  }
+
+  .glass-card-hover {
+    @apply hover:bg-white/10 hover:border-red-500/30;
+  }
+}

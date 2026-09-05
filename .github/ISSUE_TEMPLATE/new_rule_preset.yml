@@ -1,0 +1,51 @@
+name: New rule-pack preset
+description: Propose a starting-point rule pack modelled on a firm's public rulebook
+labels: ["rule-preset"]
+body:
+  - type: input
+    id: firm
+    attributes:
+      label: Firm
+      description: The rule SHAPE this models, not an affiliation with the firm.
+    validations:
+      required: true
+  - type: input
+    id: rulebook_url
+    attributes:
+      label: Public rulebook URL
+    validations:
+      required: true
+  - type: input
+    id: drawdown_mode
+    attributes:
+      label: Drawdown mode
+      description: e.g. intraday trailing, end-of-day trailing, static
+    validations:
+      required: true
+  - type: input
+    id: daily_loss_basis
+    attributes:
+      label: Daily loss basis
+      description: e.g. starting balance, prior close, high-water mark
+    validations:
+      required: true
+  - type: textarea
+    id: consistency_rule
+    attributes:
+      label: Consistency rule
+    validations:
+      required: false
+  - type: textarea
+    id: phase_scoping
+    attributes:
+      label: Phase scoping
+      description: How rules differ across challenge / verification / funded phases, if at all.
+    validations:
+      required: false
+  - type: textarea
+    id: action_per_rule
+    attributes:
+      label: Action per rule
+      description: What happens on breach for each rule (fail, warn, restrict, etc).
+    validations:
+      required: true

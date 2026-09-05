@@ -1,0 +1,88 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "risk-management/**"
+      - "scripts/setup.sh"
+      - "scripts/install.sh"
+      - ".github/workflows/ci.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "risk-management/**"
+      - "scripts/setup.sh"
+      - "scripts/install.sh"
+      - ".github/workflows/ci.yml"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  risk-management-checks:
+    name: Lint Test Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: risk-management
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: risk-management/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Test
+        run: npm run test
+
+      - name: Check isolation
+        run: npm run check:isolation
+
+      - name: Build
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY: placeholder-service-role-key
+          CRON_SECRET: placeholder-cron-secret
+          NEXT_PUBLIC_APP_URL: http://localhost:3000
+          NEXT_PUBLIC_DEMO_MODE: "true"
+
+  install-artifacts:
+    name: Install Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Syntax-check setup and install scripts
+        run: bash -n scripts/setup.sh scripts/install.sh
+
+      - name: Build demo Docker image
+        run: |
+          docker build \
+            --build-arg NEXT_PUBLIC_DEMO_MODE=true \
+            -t proprisk-demo risk-management
+
+      - name: Run demo image and smoke-test it
+        run: |
+          docker run -d -p 3000:3000 proprisk-demo
+          sleep 8
+          curl -fsS localhost:3000/home >/dev/null

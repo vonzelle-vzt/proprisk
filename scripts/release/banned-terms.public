@@ -1,0 +1,13 @@
+# Generic patterns that must never appear in a tracked file: private infrastructure
+# identifiers, hosted-deployment hostnames, machine-specific paths and real mailboxes.
+# One extended regex per line; lines starting with # are ignored. Case-insensitive.
+[a-z]{20}\.supabase\.co
+prj_[A-Za-z0-9]{8,}
+team_[A-Za-z0-9]{8,}
+[a-z0-9-]+\.vercel\.app
+C:/Users/
+/Users/[a-z]+/
+sk_live_[A-Za-z0-9]{8,}
+whsec_[A-Za-z0-9]{8,}
+eyJhbGciOi
+service_role_key *[:=] *['"]?ey

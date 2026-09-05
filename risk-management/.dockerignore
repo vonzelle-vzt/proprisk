@@ -1,0 +1,15 @@
+node_modules
+.next
+.git
+.env
+.env*.local
+.env.vercel
+npm-debug.log*
+coverage
+*.test.ts
+*.test.tsx
+src/**/*.test.ts
+src/**/*.test.tsx
+supabase/tests
+.vscode
+.DS_Store

@@ -1,0 +1,40 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/ingest-trades",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/detect-violations",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/process-violations",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/sync-news",
+      "schedule": "0 6 * * 1"
+    },
+    {
+      "path": "/api/cron/fraud-hunter",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/enforce",
+      "schedule": "*/15 * * * *"
+    },
+    {
+      "path": "/api/cron/reviewer",
+      "schedule": "30 2 * * 1-6"
+    },
+    {
+      "path": "/api/cron/morning-report",
+      "schedule": "0 12 * * *"
+    },
+    {
+      "path": "/api/cron/sample-equity",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}

@@ -1,0 +1,64 @@
+name: Security
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  gitleaks:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+
+  banned-terms:
+    name: Banned-terms scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for banned terms
+        run: bash scripts/release/check-banned-terms.sh
+
+  audit:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: risk-management
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: risk-management/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Fails the build on any CRITICAL advisory. HIGH advisories are reviewed
+      # rather than gating: the remaining ones live inside Next 14's bundled
+      # postcss and eslint-config-next's glob and clear only with the Next 16
+      # upgrade tracked in the repository issues. Dependabot alerts cover
+      # everything at every level.
+      - name: Audit dependencies (critical)
+        run: npm audit --audit-level=critical
+      - name: Audit dependencies (high, informational)
+        run: npm audit --audit-level=high || true

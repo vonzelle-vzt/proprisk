@@ -1,0 +1,15 @@
+title = "PropRisk gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Fixtures and the documented env template are not real secrets"
+regexes = [
+  '''sk_live_abc123''',
+  '''whsec_test''',
+]
+paths = [
+  '''risk-management/\.env\.local\.example''',
+  '''.*\.test\.ts''',
+]

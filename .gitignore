@@ -1,0 +1,25 @@
+# --- local agent / editor tooling (kept on disk, never shipped) ---
+.claude/
+.cursor/
+.codex/
+.vzt/
+.vzt-manifest.json
+orca.yaml
+dna-strands/
+.mcp.json
+scripts/codex-full-auto.sh
+
+# --- secrets & deploy state ---
+.env
+.env*.local
+.vercel
+*.pem
+
+# --- build artifacts ---
+node_modules/
+tsconfig.tsbuildinfo
+.DS_Store
+nul
+
+# maintainer-only banned-terms list (the names themselves must not ship)
+scripts/release/banned-terms.private

@@ -1,0 +1,43 @@
+name: New provider adapter
+description: Request or propose support for a new trading platform
+labels: ["provider-adapter"]
+body:
+  - type: input
+    id: platform
+    attributes:
+      label: Platform name
+    validations:
+      required: true
+  - type: input
+    id: docs_url
+    attributes:
+      label: Official API docs URL
+    validations:
+      required: true
+  - type: input
+    id: auth_model
+    attributes:
+      label: Auth model
+      description: e.g. API key, OAuth, broker-issued token
+    validations:
+      required: true
+  - type: dropdown
+    id: asset_class
+    attributes:
+      label: Asset class
+      options:
+        - forex
+        - futures
+        - other
+    validations:
+      required: true
+  - type: dropdown
+    id: demo_account
+    attributes:
+      label: Can you test against a demo account?
+      options:
+        - "Yes"
+        - "No"
+        - "Not sure"
+    validations:
+      required: true
