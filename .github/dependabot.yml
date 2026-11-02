@@ -1,21 +1,38 @@
 version: 2
+# Noise budget: at most one version-update PR per group per month, and security
+# fixes batched into one PR per ecosystem. Majors are grouped, not ignored —
+# `ignore` also suppresses security updates, and some fixes (e.g. Next.js
+# advisories on the 14.x line) only ship in a new major.
 updates:
   - package-ecosystem: "npm"
     directory: "/risk-management"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
     groups:
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
       minor-and-patch:
+        applies-to: version-updates
         update-types:
           - "minor"
           - "patch"
+      majors:
+        applies-to: version-updates
+        update-types:
+          - "major"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "monthly"
     groups:
-      minor-and-patch:
-        update-types:
-          - "minor"
-          - "patch"
+      security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+      all-actions:
+        applies-to: version-updates
+        patterns:
+          - "*"
